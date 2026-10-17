@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ff4fa3">
+<title>FIND YOURSELF</title>
+
+<style>
+:root {
+  --pink: #ff4fa3;
+  --light: #ffb5d9;
+  --bg: #fff4fa;
+  --card: #ffffff;
+  --text: #382333;
+  --muted: #92788a;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+header {
+  padding: 25px 20px;
+  background: linear-gradient(135deg, #ff4fa3, #ff9acb);
+  color: white;
+  border-radius: 0 0 30px 30px;
+}
+header h1 { margin: 0; font-size: 29px; }
+header p { margin-bottom: 0; }
+main {
+  padding: 18px;
+  max-width: 700px;
+  margin: auto;
+  padding-bottom: 95px;
+}
+.card {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 18px;
+  margin: 14px 0;
+  box-shadow: 0 5px 20px #e9b5d333;
+}
+h2 { font-size: 21px; }
+h3 { margin-top: 0; }
+button {
+  border: 0;
+  border-radius: 14px;
+  background: var(--pink);
+  color: white;
+  padding: 13px 16px;
+  font-size: 15px;
+  font-weight: 650;
+  cursor: pointer;
+  margin: 5px 3px 5px 0;
+}
+button.secondary {
+  background: #ffe0ef;
+  color: #7e315b;
+}
+button:active { transform: scale(.98); }
+input, textarea {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #f1c9df;
+  border-radius: 12px;
+  margin: 8px 0;
+  font: inherit;
+  background: white;
+  color: var(--text);
+}
+textarea { min-height: 110px; resize: vertical; }
+.page { display: none; }
+.page.active { display: block; }
+.choice {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: #fff0f7;
+  color: var(--text);
+  border: 1px solid #f7c6df;
+  margin: 8px 0;
+}
+.result {
+  background: #fff0f7;
+  border-radius: 14px;
+  padding: 14px;
+  margin-top: 12px;
+  line-height: 1.6;
+}
+nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 3px calc(10px + env(safe-area-inset-bottom));
+  box-shadow: 0 -5px 20px #b67c9b22;
+  z-index: 5;
+}
+nav button {
+  background: transparent;
+  color: #896b7e;
+  font-size: 12px;
+  padding: 8px 5px;
+  margin: 0;
+}
+nav button.active { color: var(--pink); }
+.small { color: var(--muted); font-size: 13px; }
+.progress {
+  height: 10px;
+  background: #ffe0ef;
+  border-radius: 20px;
+  overflow: hidden;
+}
+#progressFill {
+  height: 100%;
+  width: 0;
+  background: var(--pink);
+  transition: width .3s;
+}
+</style>
+</head>
+
+<body>
+<header>
+  <h1>FIND YOURSELF ♡</h1>
+  <p>Du darfst herausfinden, wer du wirklich bist.</p>
+</header>
+
+<main>
+<section id="home" class="page active">
+  <div class="card">
+    <h2>Willkommen bei dir selbst 💗</h2>
+    <p>Du musst nicht alles über dich wissen. Du darfst dich Schritt für Schritt kennenlernen.</p>
+    <p id="todayDate" class="small"></p>
+    <button onclick="showPage('daily')">Meine Tagesfrage →</button>
+  </div>
+
+  <div class="card">
+    <h3>🌷 Dein Weg zu dir</h3>
+    <p id="progressText">Du hast noch keine Fragen beantwortet.</p>
+    <div class="progress"><div id="progressFill"></div></div>
+  </div>
+
+  <div class="card">
+    <h3>🎮 Lerne dich spielerisch kennen</h3>
+    <p>Entdecke deine Werte, Gefühle und Stärken.</p>
+    <button onclick="startGame('either')">Entweder oder</button>
+    <button onclick="startGame('feelings')">Gefühls-Kompass</button>
+    <button onclick="startGame('values')">Was ist dir wichtig?</button>
+    <button onclick="startGame('strengths')">Stärken entdecken</button>
+  </div>
+
+  <div class="card">
+    <h3>✨ Eine Erinnerung für heute</h3>
+    <p>Du musst nicht jemand anderes werden, um wertvoll zu sein. Du darfst du selbst werden.</p>
+  </div>
+</section>
+
+<section id="daily" class="page">
+  <div class="card">
+    <h2>🌸 Deine Tagesfrage</h2>
+    <p id="dailyQuestion"></p>
+    <textarea id="dailyAnswer" placeholder="Schreibe deine Gedanken auf ..."></textarea>
+    <button onclick="saveDaily()">Antwort speichern</button>
+    <p id="dailyMessage" class="small"></p>
+    <button class="secondary" onclick="newDailyQuestion()">Andere Frage anzeigen</button>
+  </div>
+</section>
+
+<section id="games" class="page">
+  <div class="card">
+    <h2>🎮 Selbstfindungs-Spiele</h2>
+    <p>Es gibt keine falschen Antworten. Wähle das, was sich für dich richtig anfühlt.</p>
+    <button onclick="startGame('either')">Entweder oder</button>
+    <button onclick="startGame('feelings')">Gefühls-Kompass</button>
+    <button onclick="startGame('values')">Was zählt für dich?</button>
+    <button onclick="startGame('strengths')">Stärken entdecken</button>
+    <div id="gameArea"></div>
+  </div>
+</section>
+
+<section id="chapters" class="page">
+  <div class="card">
+    <h2>📚 Lerne dich kennen</h2>
+    <p>Wähle ein Thema und beantworte die Fragen in deinem eigenen Tempo.</p>
+    <div id="chapterList"></div>
+  </div>
+  <div id="questionArea"></div>
+</section>
+
+<section id="journal" class="page">
+  <div class="card">
+    <h2>📔 Mein Tagebuch</h2>
+    <p>Hier ist Platz für alles, was dich beschäftigt.</p>
+    <textarea id="journalEntry" placeholder="Was geht dir gerade durch den Kopf?"></textarea>
+    <button onclick="saveJournal()">Eintrag speichern</button>
+    <div id="journalEntries"></div>
+  </div>
+</section>
+</main>
+
+<nav>
+  <button class="active" onclick="showPage('home',this)">🏠<br>Start</button>
+  <button onclick="showPage('daily',this)">🌷<br>Tagesfrage</button>
+  <button onclick="showPage('games',this)">🎮<br>Spiele</button>
+  <button onclick="showPage('chapters',this)">📚<br>Kapitel</button>
+  <button onclick="showPage('journal',this)">📔<br>Tagebuch</button>
+</nav>
+
+<script>
+const questions = [
+  "Wer bin ich, wenn ich niemandem etwas beweisen muss?",
+  "Wann fühle ich mich wirklich wohl?",
+  "Was gibt mir Energie?",
+  "Was raubt mir Energie?",
+  "Welche Werte sind mir besonders wichtig?",
+  "Was bedeutet Vertrauen für mich?",
+  "Wann sage ich Ja, obwohl ich Nein meine?",
+  "Was wünsche ich mir von Freundschaften?",
+  "Was macht mich stolz auf mich?",
+  "Was möchte ich in meinem Leben lernen?",
+  "Welche Dinge mache ich nur, um anderen zu gefallen?",
+  "Was brauche ich, wenn ich traurig bin?",
+  "Wobei vergesse ich die Zeit?",
+  "Was bedeutet Freiheit für mich?",
+  "Wie möchte ich mich in meinem Alltag fühlen?",
+  "Welche Grenzen sind mir wichtig?",
+  "Was würde ich ausprobieren, wenn ich mutiger wäre?",
+  "Welche Eigenschaften mag ich an mir?",
+  "Was bedeutet Selbstrespekt für mich?",
+  "Wie sieht ein Tag aus, der sich nach mir anfühlt?"
+];
+
+const chapters = [
+  {name:"Wer bin ich?", qs:[questions[0],questions[1],questions[17]]},
+  {name:"Meine Werte", qs:[questions[4],questions[14],questions[18]]},
+  {name:"Meine Gefühle", qs:[questions[11],"Wie merke ich, dass ich überfordert bin?","Was hilft mir, zur Ruhe zu kommen?"]},
+  {name:"Meine Grenzen", qs:[questions[6],questions[15],"Wie kann ich freundlich Nein sagen?"]},
+  {name:"Freundschaften", qs:[questions[7],"Woran erkenne ich eine gute Freundschaft?","Wie möchte ich behandelt werden?"]},
+  {name:"Mein Selbstvertrauen", qs:[questions[8],questions[17],"Was möchte ich mir öfter zutrauen?"]},
+  {name:"Meine Interessen", qs:[questions[12],"Was wollte ich schon immer einmal lernen?","Was macht mir Spaß, auch ohne Anerkennung?"]},
+  {name:"Meine Zukunft", qs:[questions[9],questions[19],"Was möchte ich in einem Jahr über mich sagen können?"]},
+  {name:"Unabhängigkeit", qs:[questions[13],"Was möchte ich alleine ausprobieren?","Was bedeutet ein eigenes Leben für mich?"]},
+  {name:"Meine Bedürfnisse", qs:[questions[11],"Wann brauche ich Zeit für mich?","Was gibt mir Sicherheit?"]},
+  {name:"Meine Beziehungen", qs:[questions[5],"Was bedeutet gegenseitiger Respekt?","Wie kann ich ich selbst bleiben, wenn ich jemanden mag?"]},
+  {name:"Mein neues Kapitel", qs:[questions[10],"Was möchte ich hinter mir lassen?","Welchen kleinen Schritt kann ich heute machen?"]}
+];
+
+let answered = JSON.parse(localStorage.getItem("fy_answers") || "{}");
+let journal = JSON.parse(localStorage.getItem("fy_journal") || "[]");
+let currentDaily = "";
+let currentChapter = 0;
+
+function showPage(id, button) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+  if (button) button.classList.add("active");
+  else {
+    const map = {home:0,daily:1,games:2,chapters:3,journal:4};
+    document.querySelectorAll("nav button")[map[id] ?? 0].classList.add("active");
+  }
+  if (id === "journal") renderJournal();
+  if (id === "chapters") renderChapters();
+}
+
+function updateProgress() {
+  const total = chapters.reduce((n,c) => n+c.qs.length,0);
+  const count = Object.keys(answered).length;
+  document.getElementById("progressText").textContent =
+    count + " von " + total + " Fragen beantwortet";
+  document.getElementById("progressFill").style.width =
+    Math.min(100, count/total*100) + "%";
+}
+
+function newDailyQuestion() {
+  currentDaily = questions[Math.floor(Math.random()*questions.length)];
+  document.getElementById("dailyQuestion").textContent = currentDaily;
+  document.getElementById("dailyAnswer").value =
+    localStorage.getItem("fy_daily_" + currentDaily) || "";
+  document.getElementById("dailyMessage").textContent = "";
+}
+
+function saveDaily() {
+  localStorage.setItem("fy_daily_" + currentDaily,
+    document.getElementById("dailyAnswer").value);
+  document.getElementById("dailyMessage").textContent = "Deine Antwort wurde auf diesem Gerät gespeichert 💗";
+}
+
+function renderChapters() {
+  const list = document.getElementById("chapterList");
+  list.innerHTML = "";
+  chapters.forEach((chapter,i) => {
+    const b = document.createElement("button");
+    b.className = "choice";
+    b.textContent = (i+1) + ". " + chapter.name;
+    b.onclick = () => openChapter(i);
+    list.appendChild(b);
+  });
+}
+
+function openChapter(i) {
+  currentChapter = i;
+  const area = document.getElementById("questionArea");
+  area.innerHTML = "";
+  const card = document.createElement("div");
+  card.className = "card";
+  const title = document.createElement("h3");
+  title.textContent = chapters[i].name;
+  card.appendChild(title);
+  chapters[i].qs.forEach((q,j) => {
+    const label = document.createElement("p");
+    label.textContent = (j+1) + ". " + q;
+    const input = document.createElement("textarea");
+    input.placeholder = "Deine Antwort ...";
+    input.value = answered[i+"_"+j] || "";
+    input.onchange = () => {
+      answered[i+"_"+j] = input.value;
+      localStorage.setItem("fy_answers",JSON.stringify(answered));
+      updateProgress();
+    };
+    card.appendChild(label);
+    card.appendChild(input);
+  });
+  area.appendChild(card);
+  area.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+const gameData = {
+  either: {
+    title:"Entweder oder 💭",
+    intro:"Was passt heute eher zu dir?",
+    questions:[
+      ["Zeit allein","Zeit mit anderen"],
+      ["Planen","Spontan sein"],
+      ["Sicherheit","Abenteuer"],
+      ["Zuhören","Selbst erzählen"],
+      ["Ruhe","Action"]
+    ]
+  },
+  feelings: {
+    title:"Gefühls-Kompass 🌦️",
+    intro:"Wie fühlst du dich gerade? Du darfst ehrlich sein.",
+    questions:[
+      ["Ruhig","Unruhig"],
+      ["Motiviert","Erschöpft"],
+      ["Verbunden","Allein"],
+      ["Zuversichtlich","Unsicher"],
+      ["Entspannt","Überfordert"]
+    ]
+  },
+  values: {
+    title:"Was zählt für dich? 💎",
+    intro:"Wähle, was dir im Moment wichtiger ist.",
+    questions:[
+      ["Ehrlichkeit","Harmonie"],
+      ["Freiheit","Sicherheit"],
+      ["Vertrauen","Abenteuer"],
+      ["Respekt","Anerkennung"],
+      ["Ruhe","Abwechslung"]
+    ]
+  },
+  strengths: {
+    title:"Stärken entdecken 🌟",
+    intro:"Welche Fähigkeit möchtest du bei dir mehr entdecken?",
+    questions:[
+      ["Mut","Geduld"],
+      ["Kreativität","Organisation"],
+      ["Zuhören","Probleme lösen"],
+      ["Unabhängigkeit","Teamarbeit"],
+      ["Durchhaltevermögen","Neugier"]
+    ]
+  }
+};
+
+function startGame(type) {
+  showPage("games");
+  const game = gameData[type];
+  let index = 0;
+  let results = [];
+  const area = document.getElementById("gameArea");
+
+  function draw() {
+    area.innerHTML = "";
+    const title = document.createElement("h3");
+    title.textContent = game.title;
+    area.appendChild(title);
+    const intro = document.createElement("p");
+    intro.textContent = game.intro;
+    area.appendChild(intro);
+
+    if (index >= game.questions.length) {
+      const result = document.createElement("div");
+      result.className = "result";
+      result.innerHTML = "<strong>Das hast du über dich entdeckt 💗</strong>";
+      const list = document.createElement("ul");
+      results.forEach(r => {
+        const li = document.createElement("li");
+        li.textContent = r;
+        list.appendChild(li);
+      });
+      result.appendChild(list);
+      const note = document.createElement("p");
+      note.textContent = "Das ist eine Momentaufnahme, keine feste Beschreibung deiner Persönlichkeit. Du darfst dich verändern.";
+      result.appendChild(note);
+      const restart = document.createElement("button");
+      restart.textContent = "Nochmal spielen";
+      restart.onclick = () => { index=0; results=[]; draw(); };
+      result.appendChild(restart);
+      area.appendChild(result);
+      return;
+    }
+
+    const q = document.createElement("p");
+    q.textContent = "Runde " + (index+1) + " von " + game.questions.length;
+    area.appendChild(q);
+
+    game.questions[index].forEach(option => {
+      const b = document.createElement("button");
+      b.className = "choice";
+      b.textContent = option;
+      b.onclick = () => {
+        results.push(option);
+        index++;
+        draw();
+      };
+      area.appendChild(b);
+    });
+  }
+  draw();
+}
+
+function saveJournal() {
+  const input = document.getElementById("journalEntry");
+  const value = input.value.trim();
+  if (!value) return;
+  journal.unshift({date:new Date().toLocaleString("de-DE"),text:value});
+  localStorage.setItem("fy_journal",JSON.stringify(journal));
+  input.value = "";
+  renderJournal();
+}
+
+function renderJournal() {
+  const area = document.getElementById("journalEntries");
+  area.innerHTML = "";
+  journal.forEach((entry,i) => {
+    const card = document.createElement("div");
+    card.className = "result";
+    const date = document.createElement("p");
+    date.className = "small";
+    date.textContent = entry.date;
+    const content = document.createElement("p");
+    content.style.whiteSpace = "pre-wrap";
+    content.textContent = entry.text;
+    const del = document.createElement("button");
+    del.className = "secondary";
+    del.textContent = "Eintrag löschen";
+    del.onclick = () => {
+      journal.splice(i,1);
+      localStorage.setItem("fy_journal",JSON.stringify(journal));
+      renderJournal();
+    };
+    card.append(date,content,del);
+    area.appendChild(card);
+  });
+}
+
+document.getElementById("todayDate").textContent =
+  new Date().toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"});
+newDailyQuestion();
+renderChapters();
+renderJournal();
+updateProgress();
+</script>
+</body>
+</html>
